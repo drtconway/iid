@@ -2,6 +2,7 @@ import math
 import iid.basic as basic
 
 def logLowerGamma(s, x):
+    '''compute log lower incomplete gamma'''
     lx = math.log(x)
     lgs = basic.logGamma(s)
     g = lgs + math.log(s)
@@ -17,6 +18,7 @@ def logLowerGamma(s, x):
     return s*lx + lgs - x + w
 
 def lowerGamma(s, x):
+    '''compute lower incomplete gamma'''
     return math.exp(logLowerGamma(s, x))
 
 def logUpperGammaInner(s, x):
@@ -41,17 +43,21 @@ def logUpperGammaInner(s, x):
     return M, N
 
 def logUpperGamma(s, x):
+    '''compute log upper incomplete gamma'''
     M, N = logUpperGammaInner(s, x)
     return N + math.log(M)
 
 def upperGamma(s, x):
+    '''compute upper incomplete gamma'''
     M, N = logUpperGammaInner(s, x)
     return M * math.exp(N)
 
 def logBeta(a, b):
+    '''compute log beta'''
     return basic.logGamma(a) + basic.logGamma(b) - basic.logGamma(a + b)
 
 def beta(a, b):
+    '''compute beta'''
     return math.exp(logBeta(a, b))
 
 def lowerBetaLin(a, b, x):
