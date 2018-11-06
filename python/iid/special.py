@@ -61,6 +61,7 @@ def beta(a, b):
     return math.exp(logBeta(a, b))
 
 def lowerBetaLin(a, b, x):
+    '''compute lower incomplete beta using a series approximation for integer a & b'''
     #assert type(a) == int
     #assert type(b) == int
     a = int(a)
@@ -76,6 +77,7 @@ def lowerBetaLin(a, b, x):
     return s
 
 def logLowerBetaLog(a, b, x):
+    '''compute log lower incomplete beta using a log series approximation for integer a & b'''
     #assert type(a) == int
     #assert type(b) == int
     a = int(a)
@@ -99,9 +101,11 @@ def logLowerBetaLog(a, b, x):
     return s
 
 def lowerBetaLog(a, b, x):
-        return math.exp(logLowerBetaLog(a, b, x))
+    '''compute lower incomplete beta using a log series approximation for integer a & b'''
+    return math.exp(logLowerBetaLog(a, b, x))
 
 def lowerBetaCont(a, b, x):
+    '''compute lower incomplete beta using a continued fraction approximation'''
     #assert a > 1
     #assert b > 1
     y = 1 - x
@@ -122,6 +126,7 @@ def lowerBetaCont(a, b, x):
     return (x**a * y**b / beta(a, b)) * basic.contFrac(aa, bb)
 
 def txLowerBeta(f, a, b, x, n):
+    '''apply a duplication formula to compute Ix(a, b) in terms of Ix(a + n, b)'''
     y = 1 - x
     lx = math.log(x)
     ly = basic.log1p(-x)
@@ -138,6 +143,7 @@ def txLowerBeta(f, a, b, x, n):
     return p + s
 
 def lowerBeta(a, b, x):
+    '''compute lower incomplete beta Ix(a, b) heuristics to choose between different approximations'''
     if a < b:
         return 1.0 - lowerBeta(b, a, 1 - x)
 
@@ -151,6 +157,7 @@ def lowerBeta(a, b, x):
         return lowerBetaCont(a, b, x)
 
 def erf(x):
+    '''compute the error function erf(x)'''
     if x < 0:
         return - erf(-x)
 
@@ -168,6 +175,7 @@ def erf(x):
     return 2.0/basic.sqrt_pi * s
 
 def erfc(x):
+    '''compute the complement error function erfc(x) == 1 - erf(x)'''
     if x < - 0.5:
         return 2.0 - erfc(-x)
     if x < 0.5:
@@ -178,6 +186,7 @@ def erfc(x):
     return math.exp(-x*x)/math.sqrt(pi)/(x + v)
 
 def logErfc(x):
+    '''compute log(erfc(x))'''
     if x < - 0.5:
         return math.log(2.0 - erfc(-x))
     if x < 0.5:
