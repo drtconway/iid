@@ -25,12 +25,12 @@ Pure python allows the same code to run under any python implementation, includi
 the time of writing does not have a full numpy/scipy stack.
 
 
-### Lua
+### Lua (work in progress)
 
 Pure Lua enables access even in embedded environments, and sandboxed environments where  linking to
 external compiled libraries is not possible.
 
-### Javascript
+### Javascript (planned)
 
 A Javascript implementation allows both server-side (e.g. nodejs) and client-side access to high quality
 numerical implementations.
