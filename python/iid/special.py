@@ -162,10 +162,10 @@ def erf(x):
         return - erf(-x)
 
     if x > 5:
-        return 1 - math.exp(-x*x)/math.sqrt(math.pi)
+        return 1 - math.exp(-x*x)/basic.sqrt_pi
 
     if x > 4:
-        return 1 - math.exp(-x*x)/(math.sqrt(math.pi)*x)
+        return 1 - math.exp(-x*x)/(basic.sqrt_pi*x)
 
     x = float(x)
     s = x
@@ -189,7 +189,7 @@ def erfc(x):
     aa = lambda j : 0.5*j
     bb = lambda j : x
     v = basic.contFrac(aa, bb)
-    return math.exp(-x*x)/math.sqrt(pi)/(x + v)
+    return math.exp(-x*x)/(basic.sqrt_pi*(x + v))
 
 def logErfc(x):
     '''compute log(erfc(x))'''
