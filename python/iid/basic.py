@@ -164,6 +164,9 @@ def logGamma(z):
     '''compute log(gamma(x))'''
     x0 = 9
 
+    if z < 1:
+        return logGamma(z + 1) - math.log(z)
+
     if z < x0:
         n = int(math.floor(x0) - math.floor(z))
         p = 1.0
