@@ -161,6 +161,12 @@ def erf(x):
     if x < 0:
         return - erf(-x)
 
+    if x > 5:
+        return 1 - math.exp(-x*x)/math.sqrt(math.pi)
+
+    if x > 4:
+        return 1 - math.exp(-x*x)/(math.sqrt(math.pi)*x)
+
     x = float(x)
     s = x
     n = 1
@@ -169,7 +175,7 @@ def erf(x):
        p *= -x*x / n
        t = x / (2*n + 1) * p
        s += t
-       if abs(t/s) < 1e-12:
+       if s == 0 or abs(t/s) < 1e-12:
            break
        n += 1
     return 2.0/basic.sqrt_pi * s
