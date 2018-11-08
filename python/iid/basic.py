@@ -1,5 +1,5 @@
 import math
-
+import iid.chebyshev as chebyshev
 '''
 
 Sources for the methods include:
@@ -160,24 +160,95 @@ def logAdd(a, b):
     w = y - x
     return x + log1pexp(w)
 
+def fac(n):
+    '''compute n!'''
+    r = 1
+    for i in range(1,n+1):
+        r *= i
+    return r
+
+def doubleFac(n):
+    '''compute n!! = n*(n - 2)*(n - 4)...'''
+    assert type(n) == int
+    k = n
+    r = 1
+    while k > 0:
+        r *= k
+        k -= 2
+    return r
+
+def gammanph(n):
+    '''compute gamma(n + 1/2)'''
+    return sqrt_pi * doubleFac(2*n - 1) / math.pow(2, n)
+
+def logGammaP1(a):
+    '''
+    log(gamma(1+a)) for -0.2 <= a <= 1.25
+    Derived from AS63.
+    '''
+    p0 = 0.577215664901533e+00
+    p1 = 0.844203922187225e+00
+    p2 = -0.168860593646662e+00
+    p3 = -0.780427615533591e+00
+    p4 = -0.402055799310489e+00
+    p5 = -0.673562214325671e-01
+    p6 = -0.271935708322958e-02
+
+    q1 = 0.288743195473681e+01
+    q2  = 0.312755088914843e+01
+    q3 = 0.156875193295039e+01
+    q4  = 0.361951990101499e+00
+    q5 = 0.325038868253937e-01
+    q6  = 0.667465618796164e-03
+
+    r0 = 0.422784335098467e+00
+    r1  = 0.848044614534529e+00
+    r2 = 0.565221050691933e+00
+    r3  = 0.156513060486551e+00
+    r4 = 0.170502484022650e-01
+    r5  = 0.497958207639485e-03
+
+    s1 = 0.124313399877507e+01
+    s2  = 0.548042109832463e+00
+    s3 = 0.101552187439830e+00
+    s4  = 0.713309612391000e-02
+    s5 = 0.116165475989616e-03
+    if a < 0.6:
+        w = ((((((p6*a + p5)*a + p4)*a + p3)*a + p2)*a + p1)*a + p0) / ((((((q6*a + q5)*a + q4)*a + q3)*a + q2)*a + q1)*a + 1.0)
+        return -a * w
+
+    x = (a - 0.5) - 0.5
+    w = (((((r5*x + r4)*x + r3)*x + r2)*x + r1)*x + r0) / (((((s5*x + s4)*x + s3)*x + s2)*x + s1)*x + 1.0)
+    return x * w
+
 def logGamma(z):
-    '''compute log(gamma(x))'''
-    x0 = 9
+    '''
+    compute log(gamma(x))
+    Implementation due to AS63
+    '''
+    x0 = 25
 
-    if z < 1:
-        return logGamma(z + 1) - math.log(z)
+    if z < 0.8:
+        return logGammaP1(z) - math.log(z)
 
-    if z < x0:
-        n = int(math.floor(x0) - math.floor(z))
-        p = 1.0
-        for k in xrange(0, n):
-            p *= z+k
-        return logGamma(z + n) - math.log(p)
-    else:
-        z2 = z*z
-        z3 = z2*z
-        z5 = z3*z2
-        return z*math.log(z) - z - 0.5*math.log(z/(2*math.pi)) + 1.0/(12*z) + 1.0/(360*z3) + 1.0/(1260*z5)
+    if z < 2.25:
+      return logGammaP1(z - 1.0)
+
+    if z < 10:
+        return logGamma(z - 1.0) + math.log(z - 1.0)
+
+    d = 0.418938533204673
+
+    c0 = 0.833333333333333e-01
+    c1 = -0.277777777760991e-02
+    c2 = 0.793650666825390e-03
+    c3 = -0.595202931351870e-03
+    c4 = 0.837308034031215e-03
+    c5 = -0.165322962780713e-02
+
+    t = (1.0/z) ** 2
+    w = (((((c5*t + c4)*t + c3)*t + c2)*t + c1)*t + c0) / z
+    return (d+w) + (z-0.5) * (math.log(z)-1.0)
 
 def gamma(z):
     '''compute gamma(x)'''
@@ -186,13 +257,6 @@ def gamma(z):
 def logFac(n):
     '''compute log(n!)'''
     return logGamma(n + 1)
-
-def fac(n):
-    '''compute n!'''
-    r = 1
-    for i in xrange(1,n+1):
-        r *= i
-    return r
 
 def logChoose(n, k):
     '''compute log of binomial choice log(n k)'''

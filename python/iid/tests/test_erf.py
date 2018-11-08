@@ -9,5 +9,4 @@ def same(a, b, eps):
 def test_erf():
     for (x, r) in data:
         r0 = erf(x)
-        print x, r, r0, abs((r - r0)/r)
         assert same(r, r0, 5e-10)
