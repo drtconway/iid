@@ -1,5 +1,4 @@
 import math
-import iid.chebyshev as chebyshev
 '''
 
 Sources for the methods include:
