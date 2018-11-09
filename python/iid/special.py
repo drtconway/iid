@@ -1,56 +1,125 @@
 import math
 import iid.basic as basic
 
-def logLowerGamma(s, x):
-    '''compute log lower incomplete gamma'''
-    lx = math.log(x)
-    lgs = basic.logGamma(s)
-    g = lgs + math.log(s)
-    w = -g
-    k = 0
-    while True:
-        k += 1
-        g += math.log(s + k)
-        t = k * lx - g
-        w = basic.logAdd(w, t)
-        if t - w < -45:
-            break
-    return s*lx + lgs - x + w
-
-def lowerGamma(s, x):
-    '''compute lower incomplete gamma'''
-    return math.exp(logLowerGamma(s, x))
-
-def logUpperGammaInner(s, x):
-    if x == 0:
-        M, N = 1, basic.gamma(s)
-
-    def aa1(n):
-        if n == 1:
-            return 1
-        return -(n - 1)*(n - s - 1)
-
-    aa2 = lambda n: aa1(n + 1)
-
-    bb1 = lambda n: x + 2*n - 1 - s
-    bb2 = lambda n: bb1(n + 1)
-
-    if x == s - 1:
-        M = aa1(1) / basic.contFrac(aa2, bb2)
+def pickGammaMethod(a, x):
+    '''choose between different methods for computing gamma.'''
+    if x > 0.25:
+        alpha = x + 0.25
     else:
-        M = basic.contFrac(aa1, bb1)
-    N = s*math.log(x) - x
-    return M, N
+        alpha = math.log(0.5) / math.log(x)
 
-def logUpperGamma(s, x):
-    '''compute log upper incomplete gamma'''
-    M, N = logUpperGammaInner(s, x)
-    return N + math.log(M)
+    if a > alpha:
+        return 'g'
 
-def upperGamma(s, x):
-    '''compute upper incomplete gamma'''
-    M, N = logUpperGammaInner(s, x)
-    return M * math.exp(N)
+    x0 = 1.5
+    if x < x0 and -0.5 <= a:
+        return 'G1'
+    if x < x0 and a < -0.5:
+        assert False, 'incomplete gamma for a < -0.5 not implemented'
+        #return 'G2'
+    return 'G3'
+
+def upperGammaKummer(a, x):
+    '''compute upper gamma using Kummer's series.'''
+    u = (basic.gamma(1 + a) - 1) / a - (math.pow(x, a) - 1) / a
+
+    k = 1
+    tk = 1
+    ss = tk
+    while True:
+        tk *= - (a + k)*x / ((a + k + 1)*(k + 1))
+        ss += tk
+        if abs(tk/ss) < 1e-16:
+            break
+        k += 1
+    v = (math.pow(x, a + 1) / (a + 1)) * ss
+
+    return u + v
+
+def upperGammaLegendre(a, x):
+    '''compute upper gamma using a series derived from Legendre's continued fraction.'''
+    pk = 0
+    qk = (x - 1 - a)*(x + 1 - a)
+    rk = 4*(x + 1 - a)
+    sk = 1 - a
+    rhok = 0
+    tk = 1
+    k = 1
+    ss = tk
+    while True:
+        pk += sk
+        qk += rk
+        rk += 8
+        sk += 2
+        tauk = pk*(1 + rhok)
+        rhok = tauk / (qk - tauk)
+        tk *= rhok
+        ss += tk
+        if abs(tk/ss) < 1e-16:
+            break
+        k += 1
+    return math.exp(-x)*math.pow(x, a)*ss / (x + 1 - a)
+
+def lowerRegularizedGammaSeries(a, x):
+    '''compute lower regularized gamma with a Taylor series.'''
+    ss =  1.0 / basic.gamma(a + 1)
+    xn = 1
+    n = 1
+    while True:
+        xn *= x
+        tn = xn / basic.gamma(a + n + 1)
+        ss += tn
+        if abs(tn/ss) < 1e-16:
+            break
+        n += 1
+    return math.exp(-x)*math.pow(x, a)*ss
+
+def gammaP(a, x):
+    '''compute lower regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+    if alg == 'g':
+        return lowerRegularizedGammaSeries(a, x)
+
+    if alg == 'G1':
+        Gam = upperGammaKummer(a, x)
+    if alg == 'G3':
+        Gam = upperGammaLegendre(a, x)
+
+    ga = basic.gamma(a)
+    bigG = Gam / ga
+    gs = 1 - bigG
+    return gs
+
+def gammaQ(a, x):
+    '''compute upper regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+
+    if alg == 'g':
+        gs = lowerRegularizedGammaSeries(a, x)
+        return 1 - gs
+
+    if alg == 'G1':
+        Gam = upperGammaKummer(a, x)
+    if alg == 'G3':
+        Gam = upperGammaLegendre(a, x)
+
+    return Gam / basic.gamma(a)
+
+def gammaPQ(a, x):
+    '''compute both lower and upper regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+
+    if alg == 'g':
+        gs = lowerRegularizedGammaSeries(a, x)
+        return (gs, 1 - gs)
+
+    if alg == 'G1':
+        Gam = upperGammaKummer(a, x)
+    if alg == 'G3':
+        Gam = upperGammaLegendre(a, x)
+
+    bigG = Gam / basic.gamma(a)
+    return (1 - bigG, bigG)
 
 def logBeta(a, b):
     '''compute log beta'''
