@@ -159,6 +159,10 @@ def logAdd(a, b):
     w = y - x
     return x + log1pexp(w)
 
+def logSub(a, b):
+    w = b - a
+    return a + log1mexp(w)
+
 def fac(n):
     '''compute n!'''
     r = 1
