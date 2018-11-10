@@ -36,6 +36,41 @@ def upperGammaKummer(a, x):
 
     return u + v
 
+def logUpperGammaKummer(a, x):
+    '''compute log of upper gamma using Kummer's series.'''
+    la = math.log(a)
+    lx = math.log(x)
+
+    lga = basic.logGamma(a)
+    lxaoa = a * lx - la
+    if lga > lxaoa:
+        flip = False
+        lu = basic.logSub(lga, lxaoa)
+    else:
+        flip = True
+        lu = basic.logSub(lxaoa, lga)
+
+    ltk = 0
+    tkPos = True
+    lss = ltk
+    k = 1
+    while True:
+        tkPos = not tkPos
+        ltk += math.log(a + k) + lx - (math.log(a + k + 1) + math.log(k + 1))
+        if tkPos:
+            lss = basic.logAdd(lss, ltk)
+        else:
+            lss = basic.logSub(lss, ltk)
+        if ltk - lss < -45:
+            break
+        k += 1
+    lv = (a + 1)*lx - math.log(a + 1) + lss
+
+    if not flip:
+        return basic.logAdd(lu, lv)
+    else:
+        return basic.logSub(lv, lu)
+
 def upperGammaLegendre(a, x):
     '''compute upper gamma using a series derived from Legendre's continued fraction.'''
     pk = 0
@@ -60,6 +95,30 @@ def upperGammaLegendre(a, x):
         k += 1
     return math.exp(-x)*math.pow(x, a)*ss / (x + 1 - a)
 
+def logUpperGammaLegendre(a, x):
+    '''compute log of upper gamma using a series derived from Legendre's continued fraction.'''
+    pk = 0
+    qk = (x - 1 - a)*(x + 1 - a)
+    rk = 4*(x + 1 - a)
+    sk = 1 - a
+    rhok = 0
+    tk = 1
+    k = 1
+    ss = tk
+    while True:
+        pk += sk
+        qk += rk
+        rk += 8
+        sk += 2
+        tauk = pk*(1 + rhok)
+        rhok = tauk / (qk - tauk)
+        tk *= rhok
+        ss += tk
+        if abs(tk/ss) < 1e-16:
+            break
+        k += 1
+    return a * math.log(x) - x + math.log(ss) - math.log(x + 1 - a)
+
 def lowerRegularizedGammaSeries(a, x):
     '''compute lower regularized gamma with a Taylor series.'''
     ss =  1.0 / basic.gamma(a + 1)
@@ -73,6 +132,21 @@ def lowerRegularizedGammaSeries(a, x):
             break
         n += 1
     return math.exp(-x)*math.pow(x, a)*ss
+
+def logLowerRegularizedGammaSeries(a, x):
+    '''compute lower regularized gamma with a Taylor series.'''
+    lx = math.log(x)
+    lss =  - basic.logGamma(a + 1)
+    lxn = 0
+    n = 1
+    while True:
+        lxn += lx
+        ltn = lxn - basic.logGamma(a + n + 1)
+        lss = basic.logAdd(lss, ltn)
+        if ltn - lss < -45:
+            break
+        n += 1
+    return a*lx - x + lss
 
 def gammaP(a, x):
     '''compute lower regularised gamma.'''
@@ -90,6 +164,24 @@ def gammaP(a, x):
     gs = 1 - bigG
     return gs
 
+def logGammaP(a, x):
+    '''compute the log of lower regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+    if alg == 'g':
+        return logLowerRegularizedGammaSeries(a, x)
+
+    if alg == 'G1':
+        Gam = upperGammaKummer(a, x)
+        lGam = logUpperGammaKummer(a, x)
+        print Gam, math.log(Gam), lGam
+    if alg == 'G3':
+        lGam = logUpperGammaLegendre(a, x)
+
+    lga = basic.logGamma(a)
+    lBigG = lGam - lga
+    lgs = basic.log1mexp(lBigG)
+    return lgs
+
 def gammaQ(a, x):
     '''compute upper regularised gamma.'''
     alg = pickGammaMethod(a, x)
@@ -104,6 +196,21 @@ def gammaQ(a, x):
         Gam = upperGammaLegendre(a, x)
 
     return Gam / basic.gamma(a)
+
+def logGammaQ(a, x):
+    '''compute log upper regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+
+    if alg == 'g':
+        lgs = logLowerRegularizedGammaSeries(a, x)
+        return basic.log1mexp(lgs)
+
+    if alg == 'G1':
+        lGam = logUpperGammaKummer(a, x)
+    if alg == 'G3':
+        lGam = logUpperGammaLegendre(a, x)
+
+    return lGam - basic.logGamma(a)
 
 def gammaPQ(a, x):
     '''compute both lower and upper regularised gamma.'''
@@ -120,6 +227,22 @@ def gammaPQ(a, x):
 
     bigG = Gam / basic.gamma(a)
     return (1 - bigG, bigG)
+
+def logGammaPQ(a, x):
+    '''compute both log lower and log upper regularised gamma.'''
+    alg = pickGammaMethod(a, x)
+
+    if alg == 'g':
+        lgs = logLowerRegularizedGammaSeries(a, x)
+        return (lgs, basic.log1mexp(lgs))
+
+    if alg == 'G1':
+        lGam = logUpperGammaKummer(a, x)
+    if alg == 'G3':
+        lGam = logUpperGammaLegendre(a, x)
+
+    lBigG = lGam - basic.logGamma(a)
+    return (basic.log1mexp(lBigG), lBigG)
 
 def logBeta(a, b):
     '''compute log beta'''
