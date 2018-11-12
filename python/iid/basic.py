@@ -280,3 +280,52 @@ def choose(N, K):
         j += 1
     return num // den
 
+def hyper(num, den, x):
+    numPoc = [1 for a in num]
+    denPoc = [1 for b in den]
+    xN = 1
+    nFac = 1
+    n = 1
+    s = 1
+    while True:
+        t = 1
+        for i in range(len(num)):
+            ai = num[i]
+            numPoc[i] *= (ai + n - 1)
+            t *= numPoc[i]
+            if numPoc[i] == 0:
+                return s
+        for i in range(len(den)):
+            bi = den[i]
+            denPoc[i] *= (bi + n - 1)
+            t /= denPoc[i]
+        xN *= x
+        nFac *= n
+        t *= xN / nFac
+        s += t
+        if abs(t/s) < 1e-14:
+            return s
+
+def hyper2F1(a, b, c, x):
+    aPoc = 1
+    bPoc = 1
+    cPoc = 1
+    xN = 1
+    nFac = 1
+    n = 1
+    s = 1
+    while True:
+        aPoc *= (a + n - 1)
+        bPoc *= (b + n - 1)
+        cPoc *= (c + n - 1)
+        if aPoc == 0 or bPoc == 0 or cPoc == 0:
+            break
+        xN *= x
+        nFac *= n
+        t = (aPoc * bPoc / cPoc) * (xN / nFac)
+        s += t
+        if abs(t/s) < 1e-14:
+            break
+        n += 1
+    return s
+
