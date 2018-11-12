@@ -1,7 +1,7 @@
 import math
-import pystat.basic as basic
-from pystat.dist import dist
-import pystat.special as special
+import iid.basic as basic
+from iid.dist import dist
+import iid.special as special
 
 class binom(dist):
     def __init__(self, p, n):
@@ -24,7 +24,7 @@ class binom(dist):
     def pmf(self, k, **args):
         assert(k >= 0)
         assert(k <= self.n)
-        if 'log' in args and arg['log']:
+        if 'log' in args and args['log']:
             lr = basic.logChoose(self.n, k)
             return lr + k*self.lp + (self.n - k)*self.lq
         else:

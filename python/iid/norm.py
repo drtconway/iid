@@ -1,7 +1,7 @@
 import math
-import pystat.basic as basic
-from pystat.dist import dist
-import pystat.special as special
+import iid.basic as basic
+from iid.dist import dist
+import iid.special as special
 
 class norm(dist):
     def __init__(self, mu = 0.0, sig = 1.0):
