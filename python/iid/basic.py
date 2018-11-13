@@ -28,6 +28,13 @@ sqrt_pi = math.sqrt(pi)
 log_sqrt_pi = math.log(sqrt_pi)
 '''float: log(sqrt(pi))'''
 
+def sgn(x):
+    if x > 0:
+        return 1
+    if x < 0:
+        return -1
+    return 0
+
 def minMax(a, b):
     '''select the minimum and maximum of two values.
     
@@ -288,44 +295,59 @@ def hyper(num, den, x):
     n = 1
     s = 1
     while True:
-        t = 1
+        nn = 1
         for i in range(len(num)):
             ai = num[i]
             numPoc[i] *= (ai + n - 1)
-            t *= numPoc[i]
+            nn *= numPoc[i]
             if numPoc[i] == 0:
                 return s
+        dd = 1
         for i in range(len(den)):
             bi = den[i]
             denPoc[i] *= (bi + n - 1)
-            t /= denPoc[i]
+            dd *= denPoc[i]
         xN *= x
         nFac *= n
-        t *= xN / nFac
+        v = float(nn) / float(dd)
+        t = v * (float(xN) / float(nFac))
         s += t
         if abs(t/s) < 1e-14:
             return s
-
-def hyper2F1(a, b, c, x):
-    aPoc = 1
-    bPoc = 1
-    cPoc = 1
-    xN = 1
-    nFac = 1
-    n = 1
-    s = 1
-    while True:
-        aPoc *= (a + n - 1)
-        bPoc *= (b + n - 1)
-        cPoc *= (c + n - 1)
-        if aPoc == 0 or bPoc == 0 or cPoc == 0:
-            break
-        xN *= x
-        nFac *= n
-        t = (aPoc * bPoc / cPoc) * (xN / nFac)
-        s += t
-        if abs(t/s) < 1e-14:
-            break
         n += 1
-    return s
 
+def logHyper(num, den, x):
+    lx = math.log(x)
+    sgnNumPoc = [1 for a in num]
+    lnumPoc = [0 for a in num]
+    sgnDenPoc = [1 for b in den]
+    ldenPoc = [0 for b in den]
+    n = 1
+    ls = 0
+    while True:
+        sgnT = 1
+        lt = 0
+        for i in range(len(num)):
+            ai = num[i]
+            w = ai + n - 1
+            if w == 0:
+                return ls
+            sgnNumPoc[i] *= sgn(w)
+            lnumPoc[i] += math.log(abs(w))
+            sgnT *= sgnNumPoc[i]
+            lt += lnumPoc[i]
+        for i in range(len(den)):
+            bi = den[i]
+            w = bi + n - 1
+            sgnDenPoc[i] *= sgn(w)
+            ldenPoc[i] += math.log(abs(w))
+            sgnT *= sgnDenPoc[i]
+            lt -= ldenPoc[i]
+        lt += n * lx - logFac(n)
+        if sgnT > 0:
+            ls = logAdd(ls, lt)
+        else:
+            ls = logSub(ls, lt)
+        if lt - ls < -45:
+            return ls
+        n += 1
