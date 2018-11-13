@@ -173,7 +173,6 @@ def logGammaP(a, x):
     if alg == 'G1':
         Gam = upperGammaKummer(a, x)
         lGam = logUpperGammaKummer(a, x)
-        print Gam, math.log(Gam), lGam
     if alg == 'G3':
         lGam = logUpperGammaLegendre(a, x)
 

@@ -102,7 +102,7 @@ def log1p(x):
         an accurate evaluation of log(1 + x).
     '''
 
-    if abs(x) >= 1:
+    if abs(x) > 0.8:
         return math.log(1 + x)
 
     mx = -x
@@ -259,6 +259,16 @@ def logGamma(z):
     t = (1.0/z) ** 2
     w = (((((c5*t + c4)*t + c3)*t + c2)*t + c1)*t + c0) / z
     return (d+w) + (z-0.5) * (math.log(z)-1.0)
+
+def logGammaSum(a, b):
+    '''compute log gamma(a + b)'''
+    x = a + b - 2.0
+    if x <= 0.25:
+        return logGammaP1(1.0 + x)
+    if x <= 1.25:
+        return logGammaP1(x) + log1p(x)
+    return logGammaP1(x - 1.0) + math.log(x*(1.0 + x))
+
 
 def gamma(z):
     '''compute gamma(x)'''
