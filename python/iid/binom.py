@@ -10,7 +10,6 @@ class binom(dist):
         self.lp = math.log(p)
         self.lq = basic.log1p(-p)
         self.n = n
-        self.qIdx = None
 
     def mean(self):
         return self.p * self.n
