@@ -316,6 +316,45 @@ def lowerBetaCont(a, b, x):
 
     return (x**a * y**b / beta(a, b)) * basic.contFrac(aa, bb)
 
+def logLowerBetaSeries(a, b, x):
+    lx = math.log(x)
+    lv = logGamma(a+b) - logGamma(a + 1) - logGamma(b) + a * lx
+
+    s = 0
+    mbPoc = 1
+    nFac = 1
+    xN = 1
+    n = 1
+    while True:
+        mbPoc *= n - b
+        nFac *= n
+        xN *= x
+        t = (mbPoc / (nFac * (a + n))) * xN
+        s += t
+        if abs(t/s) < 1e-14:
+            break
+        n += 1
+    lu = log1p(a*s)
+    return lv + lu
+
+def lowerBetaSeries(a, b, x):
+    return math.exp(logLowerBetaSeries(a, b, x))
+
+def lowerBetaOffset(a, b, x, y, n):
+    lx = math.log(x)
+    ly = math.log(y)
+    lv = a*lx + b*ly
+
+    ls = None
+    ldi = 0
+    for j in range(1, n+1):
+        lt = basic.logGamma(a + b + j - 1) - basic.logGamma(b) - basic.logGamma(a + j) + (j-1)*lx
+        if ls is None:
+            ls = lt
+        else:
+            ls = basic.logAdd(ls, lt)
+    return math.exp(lv+ls)
+
 def txLowerBeta(f, a, b, x, n):
     '''apply a duplication formula to compute Ix(a, b) in terms of Ix(a + n, b)'''
     y = 1 - x
@@ -332,6 +371,61 @@ def txLowerBeta(f, a, b, x, n):
             ls = basic.logAdd(ls, lt)
     s = math.exp(a*lx + b*ly + ls)
     return p + s
+
+def lowerBetaClass(a, b, x):
+    y = 1 - x
+    p = a/(a+b)
+    q = b/(a+b)
+    if min(a, b) <= 1:
+        if x > 0.5:
+            r = lowerBetaClass(b, a, 1 - x)
+            if type(r) == str:
+                return '!'+r
+            return 1 - r
+
+        if any([max(a, b) <= 1 and a > min(0.2, b),
+                max(a, b) < 1 and a < min(0.2, b) and math.pow(x, a) < 0.9,
+                max(a, b) > 1 and b < 1,
+                max(a, b) > 1 and b > 1 and x < 0.1, math.pow(b*x, a) < 0.7]):
+            return lowerBetaSeries(a, b, x)
+        if any([max(a, b) > 1 and b > 1 and x < 0.1, math.pow(b*x, a) < 0.7,
+                max(a, b) > 1 and b > 1 and x > 0.3]):
+            return 1 - lowerBetaSeries(b, a, y)
+        if any([max(a, b) > 1 and b > 15 and 0.1 < x and x < 0.3,
+                max(a, b) > 1 and b > 15 and x < 0.1 and math.pow(b*x, a) > 0.7]):
+            return 'bgrat(b, a, y, x, w0=0)'
+        if any([max(a, b) > 1 and b > 1 and 0.1 < x and x < 0.3 and b < 15,
+                max(a, b) > 1 and b > 1 and x < 0.1 and math.pow(b*x, a) > 0.7 and b <= 15,
+                max(a, b) < 1 and a < min(0.2, b), math.pow(x, a) > 0.9 and x <0.3]):
+            return 'bgrat(b, a, y, x, w0=bup(b, a, y, x, n = 20))'
+    else:
+        if x > p:
+            r = lowerBetaClass(b, a, 1 - x)
+            if type(r) == str:
+                return '!'+r
+            return 1 - r
+
+        if any([b < 40 and b*x < 0.7]):
+            return lowerBetaSeries(a, b, x)
+        if any([b < 40 and b*x > 0.7 and x <= 0.7]):
+            n = int(math.floor(b))
+            if n == b:
+                n -= 1
+            u = lowerBetaOffset(b - n, a, y, x, n)
+            v = lowerBetaSeries(a, b - n, x)
+            return u + v
+        if any([b < 40 and x > 0.7 and a > 15]):
+            return 'bgrat(a+m, b, x, y, w0 = bup(b\', a, y, x, n) + bup(a, b\', x, y, m)), m = 20'
+        if any([b >= 40 and a <= b and a <= 15,
+                b >= 40 and 100 < a and a <= b and x < 0.97*p,
+                b >= 40 and a > b and b <= 100,
+                b >= 40 and 100 < a and a < b and y > 1.03*q]):
+            return 'bfrac(a, b, x, y)'
+        if any([b >= 40 and 100 < a and a <= b and x >= 0.97*p,
+                b >= 40 and 100 < b and b < a and y <= 1.03*q]):
+            return 'basym(a, b, x, y)'
+
+    return 'none'
 
 def lowerBeta(a, b, x):
     '''compute lower incomplete beta Ix(a, b) heuristics to choose between different approximations'''
