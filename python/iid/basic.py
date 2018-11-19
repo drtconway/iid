@@ -315,44 +315,28 @@ def choose(N, K):
     return num // den
 
 def hyper(num, den, x):
-    numPoc = [1 for a in num]
-    denPoc = [1 for b in den]
+    N = max(len(num), len(den))
     xN = 1
-    nFac = 1
     n = 1
     s = 1
+    u = 1.0
     while True:
-        nn = 1
-        for i in range(len(num)):
-            ai = num[i]
-            numPoc[i] *= (ai + n - 1)
-            nn *= numPoc[i]
-            if numPoc[i] == 0:
-                return s
-        dd = 1
-        for i in range(len(den)):
-            bi = den[i]
-            denPoc[i] *= (bi + n - 1)
-            dd *= denPoc[i]
+        for i in range(N):
+            if i < len(num):
+                ai = num[i]
+                v = ai + n - 1
+                if v == 0:
+                    return s
+                u *= v
+            if i < len(den):
+                bi = den[i]
+                v = (bi + n - 1)
+                u /= v
+        u /= n
         xN *= x
-        nFac *= n
-        dd *= nFac
-        lnn = math.log(nn)
-        ldd = math.log(dd)
-        #if lnn > 700 or ldd > 700:
-        #    dx = gcd(nn, dd)
-        #    nn /= dx
-        #    dd /= dx
-        #if lnn < 700 and ldd < 700 and lnn - ldd < 700:
-        #    v = float(nn) / float(dd)
-        #elif lnn - ldd < 700:
-        #    v = math.exp(lnn - ldd)
-        #else:
-        #    # Our last hope is to redo from start in log-space.
-        #    r = logHyper(num, den, x)
-        #    return math.exp(r)
-        v = math.exp(lnn - ldd)
-        t = v * float(xN)
+        t = u * float(xN)
+        if math.isinf(t):
+            return s
         s += t
         if abs(t/s) < 1e-14:
             return s

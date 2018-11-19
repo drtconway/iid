@@ -17,11 +17,4 @@ def test_ibetaInt():
         x = itm[2]
         rL = itm[3]
         rL0 = lowerBeta(a, b, x)
-        if x > 0.001 and x < 0.99:
-            if not same(rL, rL0, 5e-11):
-                print a, b, x, rL, rL0, abs((rL - rL0)/rL)
-            assert same(rL, rL0, 5e-11)
-        else:
-            if not same(rL, rL0, 5e-9):
-                print a, b, x, rL, rL0, abs((rL - rL0)/rL)
-            assert same(rL, rL0, 5e-9)
+        assert same(rL, rL0, 1e-12)

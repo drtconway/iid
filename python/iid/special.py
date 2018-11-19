@@ -90,10 +90,7 @@ def upperGammaSeries(a, x):
         k += 1
 
     s1 = basic.kahanSum(ts)
-    print s, s1
-    print ts
     gap1m1 = basic.gamma(a + 1) - 1
-    print gap1m1, basic.powm1(x, a)
     return (gap1m1 - basic.powm1(x, a)) / a + math.pow(x, a)*s
 
 def upperGammaLegendre(a, x):
@@ -351,26 +348,19 @@ def lowerBetaLog(a, b, x):
     '''compute lower incomplete beta using a log series approximation for integer a & b'''
     return math.exp(logLowerBetaLog(a, b, x))
 
-def lowerBetaInt0(a, b, x, flip = True):
-    if flip and a < b:
-        return 1 - lowerBetaInt(b, a, 1 - x)
-    v = basic.logChoose(a + b, b)
-    if v < 100:
-        return lowerBetaLin(a, b, x)
-    else:
-        return math.exp(logLowerBetaLog(a, b, x))
-
 def lowerBetaInt(a, b, x):
     y = 1 - x
+    if x > float(a)/float(a+b):
+        return 1 - lowerBetaInt(b, a, y)
 
     lx = math.log(x)
     ly = basic.log1p(-x)
     lpfx = a*lx + b*ly
 
-    if a < 350 and b < 250 and lpfx > -700:
+    if a < 350 and b < 350 and lpfx > -700:
         xa = math.pow(x, a)
         yb = math.pow(y, b)
-        bx = xa*yb/a * math.exp(basic.logHyper([a+b, 1], [a+1], x))
+        bx = xa*yb/a * basic.hyper([a+b, 1], [a+1], x)
         bab = betaInt(a, b)
         return bx/bab
     else:
@@ -486,11 +476,9 @@ def lowerBetaClass(a, b, x):
         if any([max(a, b) > 1 and b > 1 and 0.1 < x and x < 0.3 and b < 15,
                 max(a, b) > 1 and b > 1 and x < 0.1 and math.pow(b*x, a) > 0.7 and b <= 15,
                 max(a, b) < 1 and a < min(0.2, b), math.pow(x, a) > 0.9 and x <0.3]):
-            print 'bgrat(b, a, y, x, w0=bup(b, a, y, x, n = 20))'
             n = 20
             u = lowerBetaOffset(b + n, a, y, x, n)
             v = lowerBetaSeries(b + n, a, y)
-            print u, v
             return 1 - u + v
     else:
         if x > p:
