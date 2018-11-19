@@ -147,6 +147,95 @@ int main(int argc, const char* argv[])
         }
     }
 
+    if (fun == "betaInt")
+    {
+        std::vector<unsigned long> A;
+        gen_k_unsigned_exp(0.01, rng, N, A, false);
+        std::vector<unsigned long> B;
+        gen_k_unsigned_exp(0.01, rng, N, B, false);
+
+        std::vector<cpp_dec_float_50> Y;
+        for (int i = 0; i < N; ++i)
+        {
+	    A[i] += 1;
+	    B[i] += 1;
+            cpp_dec_float_50 y = boost::math::beta(A[i], B[i]);
+            Y.push_back(y);
+        }
+        if (lang == "python")
+        {
+            cout << "seed = " << S << endl;
+            cout << "data = [" << endl;
+            for (int i = 0; i < N; ++i)
+            {
+                cout << "\t(" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? ")," : ")") << endl;
+            }
+            cout << "]" << endl;
+            return 0;
+        }
+        if (lang == "lua")
+        {
+            cout << "local seed = " << S << endl;
+            cout << "local data = {" << endl;
+            for (int i = 0; i < N; ++i)
+            {
+                cout << "\t{" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? "}," : "}") << endl;
+            }
+            cout << "}" << endl;
+            cout << "return {seed = seed, data = data}" << endl;
+            return 0;
+        }
+    }
+
+    if (fun == "ibetaInt")
+    {
+        std::vector<unsigned long> A;
+        gen_k_unsigned_exp(0.01, rng, N, A, false);
+        std::vector<unsigned long> B;
+        gen_k_unsigned_exp(0.01, rng, N, B, false);
+
+        std::vector<cpp_dec_float_50> X;
+        gen_x_unsigned_unif(rng, N, X, false);
+
+        std::vector<cpp_dec_float_50> Y;
+        std::vector<cpp_dec_float_50> Z;
+        boost::random::uniform_real_distribution<> runif;
+        for (int i = 0; i < N; ++i)
+        {
+	    ++A[i];
+	    ++B[i];
+            cpp_dec_float_50 y = boost::math::ibeta(A[i], B[i], X[i]);
+            cpp_dec_float_50 z = boost::math::ibetac(A[i], B[i], X[i]);
+            Y.push_back(y);
+            Z.push_back(z);
+        }
+        if (lang == "python")
+        {
+            cout << "seed = " << S << endl;
+            cout << "data = [" << endl;
+            for (int i = 0; i < N; ++i)
+            {
+                cout << "\t(" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
+                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? ")," : ")") << endl;
+            }
+            cout << "]" << endl;
+            return 0;
+        }
+        if (lang == "lua")
+        {
+            cout << "local seed = " << S << endl;
+            cout << "local data = {" << endl;
+            for (int i = 0; i < N; ++i)
+            {
+                cout << "\t{" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
+                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? "}," : "}") << endl;
+            }
+            cout << "}" << endl;
+            cout << "return {seed = seed, data = data}" << endl;
+            return 0;
+        }
+    }
+
     if (fun == "ibeta")
     {
         std::vector<cpp_dec_float_50> A;

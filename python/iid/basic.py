@@ -160,6 +160,13 @@ def log1pexp(x):
     else:
         return x
 
+def powm1(x, y):
+    '''compute x**y - 1'''
+    l = y * math.log(x)
+    if l < 0.5:
+        return expm1(l)
+    return math.pow(x, y) - 1
+
 def logAdd(a, b):
     '''compute log(exp(a) + exp(b))'''
     y, x = minMax(a, b)
@@ -185,6 +192,16 @@ def doubleFac(n):
     while k > 0:
         r *= k
         k -= 2
+    return r
+
+def kahanSum(xs):
+    r = 0.0
+    c = 0.0
+    for x in xs:
+        y = x - c
+        t = r + y
+        c = (t - r) - y
+        r = t
     return r
 
 def gammanph(n):
@@ -319,8 +336,23 @@ def hyper(num, den, x):
             dd *= denPoc[i]
         xN *= x
         nFac *= n
-        v = float(nn) / float(dd)
-        t = v * (float(xN) / float(nFac))
+        dd *= nFac
+        lnn = math.log(nn)
+        ldd = math.log(dd)
+        #if lnn > 700 or ldd > 700:
+        #    dx = gcd(nn, dd)
+        #    nn /= dx
+        #    dd /= dx
+        #if lnn < 700 and ldd < 700 and lnn - ldd < 700:
+        #    v = float(nn) / float(dd)
+        #elif lnn - ldd < 700:
+        #    v = math.exp(lnn - ldd)
+        #else:
+        #    # Our last hope is to redo from start in log-space.
+        #    r = logHyper(num, den, x)
+        #    return math.exp(r)
+        v = math.exp(lnn - ldd)
+        t = v * float(xN)
         s += t
         if abs(t/s) < 1e-14:
             return s
@@ -361,3 +393,37 @@ def logHyper(num, den, x):
         if lt - ls < -45:
             return ls
         n += 1
+
+def gcd(a, b):
+    a = abs(a)
+    b = abs(b)
+
+    if a == 0:
+        return b
+    if b == 0:
+        return a
+
+    d = 0
+    while (a|b) & 1 == 0:
+        a >>= 1
+        b >>= 1
+        d += 1
+
+    while a & 1 == 0:
+        a >>= 1
+
+    while True:
+        while b & 1 == 0:
+            b >>= 1
+
+        if a > b:
+            t = a
+            a = b
+            b = t
+
+        b = b - a
+
+        if b == 0:
+            break
+
+    return a << d

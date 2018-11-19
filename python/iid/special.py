@@ -71,6 +71,31 @@ def logUpperGammaKummer(a, x):
     else:
         return basic.logSub(lv, lu)
 
+def upperGammaSeries(a, x):
+    s = 0
+    k = 1
+    m1k = 1
+    xk = 1
+    kfac = 1
+    ts = []
+    while True:
+        m1k *= -1
+        xk *= x
+        kfac *= k
+        t = m1k*xk/((a+k)*kfac)
+        s += t
+        ts.append(t)
+        if abs(t/s) < 1e-14:
+            break
+        k += 1
+
+    s1 = basic.kahanSum(ts)
+    print s, s1
+    print ts
+    gap1m1 = basic.gamma(a + 1) - 1
+    print gap1m1, basic.powm1(x, a)
+    return (gap1m1 - basic.powm1(x, a)) / a + math.pow(x, a)*s
+
 def upperGammaLegendre(a, x):
     '''compute upper gamma using a series derived from Legendre's continued fraction.'''
     pk = 0
@@ -118,6 +143,17 @@ def logUpperGammaLegendre(a, x):
             break
         k += 1
     return a * math.log(x) - x + math.log(ss) - math.log(x + 1 - a)
+
+def lowerGammaSeries(a, x):
+    t = 1.0
+    s = 0.0
+    while True:
+        a += 1
+        t *= x/a
+        s += t
+        if abs(t/s) < 1e-14:
+            break
+    return s
 
 def lowerRegularizedGammaSeries(a, x):
     '''compute lower regularized gamma with a Taylor series.'''
@@ -251,6 +287,26 @@ def beta(a, b):
     '''compute beta'''
     return math.exp(logBeta(a, b))
 
+def betaInt(a, b):
+    assert type(a) == int and a > 0
+    assert type(b) == int and b > 0
+
+    if a < b:
+        return betaInt(b, a)
+
+    n = 1
+    d = a
+    for i in range(1,b):
+        n *= i
+        d *= (a + i)
+    f = basic.gcd(n, d)
+    n /= f
+    d /= f
+    return float(n)/float(d)
+
+def logBetaInt(a, b):
+    return math.log(betaInt(a, b))
+
 def lowerBetaLin(a, b, x):
     '''compute lower incomplete beta using a series approximation for integer a & b'''
     #assert type(a) == int
@@ -295,6 +351,37 @@ def lowerBetaLog(a, b, x):
     '''compute lower incomplete beta using a log series approximation for integer a & b'''
     return math.exp(logLowerBetaLog(a, b, x))
 
+def lowerBetaInt0(a, b, x, flip = True):
+    if flip and a < b:
+        return 1 - lowerBetaInt(b, a, 1 - x)
+    v = basic.logChoose(a + b, b)
+    if v < 100:
+        return lowerBetaLin(a, b, x)
+    else:
+        return math.exp(logLowerBetaLog(a, b, x))
+
+def lowerBetaInt(a, b, x):
+    y = 1 - x
+
+    lx = math.log(x)
+    ly = basic.log1p(-x)
+    lpfx = a*lx + b*ly
+
+    if a < 350 and b < 250 and lpfx > -700:
+        xa = math.pow(x, a)
+        yb = math.pow(y, b)
+        bx = xa*yb/a * math.exp(basic.logHyper([a+b, 1], [a+1], x))
+        bab = betaInt(a, b)
+        return bx/bab
+    else:
+        # Try log space
+        lbx = lpfx - math.log(a) + basic.logHyper([a+b, 1], [a+1], x)
+        lbab = logBetaInt(a, b)
+        if lbx - lbab > 0:
+            # avoid rounding errors
+            lbab = lbx
+        return math.exp(lbx - lbab)
+
 def lowerBetaCont(a, b, x):
     '''compute lower incomplete beta using a continued fraction approximation'''
     #assert a > 1
@@ -318,7 +405,7 @@ def lowerBetaCont(a, b, x):
 
 def logLowerBetaSeries(a, b, x):
     lx = math.log(x)
-    lv = logGamma(a+b) - logGamma(a + 1) - logGamma(b) + a * lx
+    lv = basic.logGamma(a+b) - basic.logGamma(a + 1) - basic.logGamma(b) + a * lx
 
     s = 0
     mbPoc = 1
@@ -334,7 +421,7 @@ def logLowerBetaSeries(a, b, x):
         if abs(t/s) < 1e-14:
             break
         n += 1
-    lu = log1p(a*s)
+    lu = basic.log1p(a*s)
     return lv + lu
 
 def lowerBetaSeries(a, b, x):
@@ -376,6 +463,8 @@ def lowerBetaClass(a, b, x):
     y = 1 - x
     p = a/(a+b)
     q = b/(a+b)
+    if type(a) == int and type(b) == int:
+        return lowerBetaInt(a, b, x)
     if min(a, b) <= 1:
         if x > 0.5:
             r = lowerBetaClass(b, a, 1 - x)
@@ -393,11 +482,16 @@ def lowerBetaClass(a, b, x):
             return 1 - lowerBetaSeries(b, a, y)
         if any([max(a, b) > 1 and b > 15 and 0.1 < x and x < 0.3,
                 max(a, b) > 1 and b > 15 and x < 0.1 and math.pow(b*x, a) > 0.7]):
-            return 'bgrat(b, a, y, x, w0=0)'
+            return  1 - lowerBetaSeries(b, a, y)
         if any([max(a, b) > 1 and b > 1 and 0.1 < x and x < 0.3 and b < 15,
                 max(a, b) > 1 and b > 1 and x < 0.1 and math.pow(b*x, a) > 0.7 and b <= 15,
                 max(a, b) < 1 and a < min(0.2, b), math.pow(x, a) > 0.9 and x <0.3]):
-            return 'bgrat(b, a, y, x, w0=bup(b, a, y, x, n = 20))'
+            print 'bgrat(b, a, y, x, w0=bup(b, a, y, x, n = 20))'
+            n = 20
+            u = lowerBetaOffset(b + n, a, y, x, n)
+            v = lowerBetaSeries(b + n, a, y)
+            print u, v
+            return 1 - u + v
     else:
         if x > p:
             r = lowerBetaClass(b, a, 1 - x)
@@ -416,11 +510,13 @@ def lowerBetaClass(a, b, x):
             return u + v
         if any([b < 40 and x > 0.7 and a > 15]):
             return 'bgrat(a+m, b, x, y, w0 = bup(b\', a, y, x, n) + bup(a, b\', x, y, m)), m = 20'
-        if any([b >= 40 and a <= b and a <= 15,
+        if any([b < 40 and x > 0.7 and a <= 15]):
+            return lowerBetaSeries(a, b, x)
+        if any([b >= 40 and a <= b and a <= 100,
                 b >= 40 and 100 < a and a <= b and x < 0.97*p,
                 b >= 40 and a > b and b <= 100,
-                b >= 40 and 100 < a and a < b and y > 1.03*q]):
-            return 'bfrac(a, b, x, y)'
+                b >= 40 and 100 < a and b < a and y > 1.03*q]):
+            return lowerBetaCont(a, b, x)
         if any([b >= 40 and 100 < a and a <= b and x >= 0.97*p,
                 b >= 40 and 100 < b and b < a and y <= 1.03*q]):
             return 'basym(a, b, x, y)'
@@ -429,17 +525,7 @@ def lowerBetaClass(a, b, x):
 
 def lowerBeta(a, b, x):
     '''compute lower incomplete beta Ix(a, b) heuristics to choose between different approximations'''
-    if a < b:
-        return 1.0 - lowerBeta(b, a, 1 - x)
-
-    if math.floor(a)/a > 0.95 and math.floor(b)/b > 0.95:
-        v = basic.logChoose(a + b, b)
-        if v < 100:
-            return lowerBetaLin(a, b, x)
-        else:
-            return math.exp(logLowerBetaLog(a, b, x))
-    else:
-        return lowerBetaCont(a, b, x)
+    return lowerBetaClass(a, b, x)
 
 def erf(x):
     '''compute the error function erf(x)'''
