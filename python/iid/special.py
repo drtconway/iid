@@ -323,50 +323,6 @@ def betaInt(a, b):
         return betaIntImpl(a, b)
     return math.exp(lb)
 
-def lowerBetaLin(a, b, x):
-    '''compute lower incomplete beta using a series approximation for integer a & b'''
-    #assert type(a) == int
-    #assert type(b) == int
-    a = int(a)
-    b = int(b)
-    y = 1 - x
-    m = a
-    n = a + b - 1
-    s = 0
-    for j in xrange(m, n+1):
-        c = basic.choose(n, j)
-        t = c * (x**j) * (y**(n-j))
-        s += t
-    return s
-
-def logLowerBetaLog(a, b, x):
-    '''compute log lower incomplete beta using a log series approximation for integer a & b'''
-    #assert type(a) == int
-    #assert type(b) == int
-    a = int(a)
-    b = int(b)
-    y = 1 - x
-    lx = math.log(x)
-    ly = basic.log1p(-x)
-    m = a
-    n = a + b - 1
-    s = None
-    for j in xrange(m, n+1):
-        lc = basic.logChoose(n, j)
-        t = lc  + j*lx + (n-j)*ly
-        if s is None:
-            s = t
-        else:
-            s = basic.logAdd(s, t)
-    if s is None:
-        # ~log(1/inf)
-        return -999
-    return s
-
-def lowerBetaLog(a, b, x):
-    '''compute lower incomplete beta using a log series approximation for integer a & b'''
-    return math.exp(logLowerBetaLog(a, b, x))
-
 def lowerBetaInt(a, b, x):
     y = 1 - x
     if x > float(a)/float(a+b):
