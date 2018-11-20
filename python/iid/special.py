@@ -284,12 +284,12 @@ def beta(a, b):
     '''compute beta'''
     return math.exp(logBeta(a, b))
 
-def betaInt(a, b):
+def betaIntImpl(a, b):
     assert type(a) == int and a > 0
     assert type(b) == int and b > 0
 
     if a < b:
-        return betaInt(b, a)
+        return betaIntImpl(b, a)
 
     n = 1
     d = a
@@ -299,10 +299,29 @@ def betaInt(a, b):
     f = basic.gcd(n, d)
     n /= f
     d /= f
+    ln = math.log(n)
+    ld = math.log(d)
+    if ln > 700 or ld > 700:
+        return math.exp(ln - ld)
     return float(n)/float(d)
 
 def logBetaInt(a, b):
-    return math.log(betaInt(a, b))
+    lga = basic.logGamma(a)
+    lgb = basic.logGamma(b)
+    lgab = basic.logGamma(a+b)
+    lb = lga + lgb - lgab
+    if lb > -700:
+        return math.log(betaIntImpl(a, b))
+    return lb
+
+def betaInt(a, b):
+    lga = basic.logGamma(a)
+    lgb = basic.logGamma(b)
+    lgab = basic.logGamma(a+b)
+    lb = lga + lgb - lgab
+    if lb > -700:
+        return betaIntImpl(a, b)
+    return math.exp(lb)
 
 def lowerBetaLin(a, b, x):
     '''compute lower incomplete beta using a series approximation for integer a & b'''
