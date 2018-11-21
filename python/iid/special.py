@@ -472,7 +472,8 @@ def lowerBetaClass(a, b, x):
             v = lowerBetaSeries(a, b - n, x)
             return u + v
         if any([b < 40 and x > 0.7 and a > 15]):
-            return 'bgrat(a+m, b, x, y, w0 = bup(b\', a, y, x, n) + bup(a, b\', x, y, m)), m = 20'
+            #return 'bgrat(a+m, b, x, y, w0 = bup(b\', a, y, x, n) + bup(a, b\', x, y, m)), m = 20'
+            return lowerBetaSeries(a, b, x)
         if any([b < 40 and x > 0.7 and a <= 15]):
             return lowerBetaSeries(a, b, x)
         if any([b >= 40 and a <= b and a <= 100,
@@ -482,7 +483,8 @@ def lowerBetaClass(a, b, x):
             return lowerBetaCont(a, b, x)
         if any([b >= 40 and 100 < a and a <= b and x >= 0.97*p,
                 b >= 40 and 100 < b and b < a and y <= 1.03*q]):
-            return 'basym(a, b, x, y)'
+            #return 'basym(a, b, x, y)'
+            return lowerBetaSeries(a, b, x)
 
     return 'none'
 
