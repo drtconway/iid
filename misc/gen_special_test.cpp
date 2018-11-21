@@ -91,18 +91,17 @@ void gen_k_unsigned_exp(const double r, boost::random::mt19937& rng, int N, std:
 int main(int argc, const char* argv[])
 {
     std::string fun(argv[1]);
-    std::string lang(argv[2]);
 
     int N = 200;
     if (argc >= 4)
     {
-        N = boost::lexical_cast<unsigned long>(argv[3]);
+        N = boost::lexical_cast<unsigned long>(argv[2]);
     }
 
     unsigned long S = 17;
     if (argc >= 5)
     {
-        S = boost::lexical_cast<unsigned long>(argv[4]);
+        S = boost::lexical_cast<unsigned long>(argv[3]);
         std::cerr << S << endl;
     }
     boost::random::mt19937 rng(S);
@@ -122,29 +121,14 @@ int main(int argc, const char* argv[])
             cpp_dec_float_50 y = boost::math::beta(A[i], B[i]);
             Y.push_back(y);
         }
-        if (lang == "python")
+
+        cout << "seed:" << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "betaInt")
@@ -162,29 +146,14 @@ int main(int argc, const char* argv[])
             cpp_dec_float_50 y = boost::math::beta(A[i], B[i]);
             Y.push_back(y);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << A[i] << ", " << B[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "ibetaInt")
@@ -202,38 +171,22 @@ int main(int argc, const char* argv[])
         boost::random::uniform_real_distribution<> runif;
         for (int i = 0; i < N; ++i)
         {
-	    ++A[i];
-	    ++B[i];
+            ++A[i];
+            ++B[i];
             cpp_dec_float_50 y = boost::math::ibeta(A[i], B[i], X[i]);
             cpp_dec_float_50 z = boost::math::ibetac(A[i], B[i], X[i]);
             Y.push_back(y);
             Z.push_back(z);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
-                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
+                                                          << Z[i] << ", " << log(Z[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
-                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "ibeta")
@@ -256,31 +209,15 @@ int main(int argc, const char* argv[])
             Y.push_back(y);
             Z.push_back(z);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
-                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
+                                                          << Z[i] << ", " << log(Z[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << A[i] << ", " << B[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i]) << ", "
-                                                              << Z[i] << ", " << log(Z[i]) << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "choose")
@@ -299,29 +236,14 @@ int main(int argc, const char* argv[])
             C.push_back(c);
             D.push_back(d);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << (J[i] + K[i]) << ", " << K[i] << ", " << C[i] << ", " << D[i] << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << (J[i] + K[i]) << ", " << K[i] << ", " << C[i] << ", " << D[i] << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << (J[i] + K[i]) << ", " << K[i] << ", " << C[i] << ", " << D[i] << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "erf")
@@ -335,29 +257,13 @@ int main(int argc, const char* argv[])
             cpp_dec_float_50 y = erf(X[i]);
             Y.push_back(y);
         }
-        if (lang == "python")
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << X[i] << ", " << Y[i] << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << X[i] << ", " << Y[i] << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << X[i] << ", " << Y[i] << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "erfc")
@@ -371,29 +277,14 @@ int main(int argc, const char* argv[])
             cpp_dec_float_50 y = erfc(X[i]);
             Y.push_back(y);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << X[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << X[i] << ", " << Y[i] << ", " << log(Y[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << X[i] << ", " << Y[i] << ", " << log(Y[i]) << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
     if (fun == "gamma")
@@ -410,29 +301,15 @@ int main(int argc, const char* argv[])
             Y.push_back(y);
             Z.push_back(z);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << X[i] << ", " << Y[i] << ", " << Z[i] << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << X[i] << ", " << Y[i] << ", " << Z[i] << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << X[i] << ", " << Y[i] << ", " << Z[i] << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        cout << "]" << endl;
+        return 0;
     }
 
     if (fun == "igamma")
@@ -453,33 +330,15 @@ int main(int argc, const char* argv[])
             Y.push_back(y);
             Z.push_back(z);
         }
-        if (lang == "python")
+
+        cout << "seed: " << S << endl;
+        cout << "data:" << endl;
+        for (int i = 0; i < N; ++i)
         {
-            cout << "seed = " << S << endl;
-            cout << "data = [" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t(" << A[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i])
-                                                              << ", " << Z[i] << ", " << log(Z[i])
-                                                              << (i < N - 1 ? ")," : ")") << endl;
-            }
-            cout << "]" << endl;
-            return 0;
+            cout << "- [" << A[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i])
+                                                          << ", " << Z[i] << ", " << log(Z[i]) << "]" << endl;
         }
-        if (lang == "lua")
-        {
-            cout << "local seed = " << S << endl;
-            cout << "local data = {" << endl;
-            for (int i = 0; i < N; ++i)
-            {
-                cout << "\t{" << A[i] << ", " << X[i] << ", " << Y[i] << ", " << log(Y[i])
-                                                              << ", " << Z[i] << ", " << log(Z[i])
-                                                              << (i < N - 1 ? "}," : "}") << endl;
-            }
-            cout << "}" << endl;
-            cout << "return {seed = seed, data = data}" << endl;
-            return 0;
-        }
+        return 0;
     }
 
    return 1;
