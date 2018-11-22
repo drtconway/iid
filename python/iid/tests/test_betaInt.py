@@ -1,10 +1,16 @@
+import os
+import yaml
+
 from iid.special import betaInt, logBetaInt
-from iid.tests.data_betaInt import data
 
 def same(a, b, eps):
     if a != 0:
         return abs((a - b)/a) < eps
     return abs(a - b) < eps
+
+wd = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(wd, 'data', 'special', 'betaInt.yaml')) as f:
+    data = yaml.load(f)['data']
 
 def test_betaInt():
     for (a, b, r, lr) in data:

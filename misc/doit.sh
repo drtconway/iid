@@ -1,10 +1,17 @@
 #!/bin/bash
 
-g++ -o gen_special_test gen_special_test.cpp
+#
+# Generate test data for special functions
+#
 
+set -e
+
+mkdir -p data/special
+g++ -o gen_special_test gen_special_test.cpp
 N=1000
-for fun in beta ibeta choose erf erfc gamma igamma;
+for fun in betaInt beta ibetaInt ibeta choose erf erfc gamma igamma;
 do
-    r=$RANDOM
-    ./gen_special_test ${fun} python ${N} ${r} > ../python/iid/tests/data_${fun}.py
+    echo "generating data for special/${fun}"
+    r=$(./mkSeed ${fun})
+    ./gen_special_test ${fun} ${N} ${r} > data/special/${fun}.yaml
 done
