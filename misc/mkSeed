@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+import hashlib
+import sys
+
+m = hashlib.new('sha256')
+for x in sys.argv[1:]:
+    m.update(x)
+hx = m.hexdigest()[:7]
+print int(hx, 16)
