@@ -27,8 +27,14 @@ class binom(dist):
             lr = basic.logChoose(self.n, k)
             return lr + k*self.lp + (self.n - k)*self.lq
         else:
-            r = basic.choose(self.n, k)
-            return r * (self.p**k) * (self.q**(self.n-k))
+            v = k*self.lp + (self.n - k)*self.lq
+            if v > -700:
+                r = basic.choose(self.n, k)
+                return r * (self.p**k) * (self.q**(self.n-k))
+            else:
+                lr = basic.logChoose(self.n, k)
+                lr += k*self.lp + (self.n - k)*self.lq
+                return math.exp(lr)
 
     def cdf(self, k, **args):
         ls = self.n*self.lq
