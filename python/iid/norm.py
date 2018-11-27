@@ -34,9 +34,9 @@ class norm(dist):
         z = (x - self.mu)/self.sr2
         if log:
             if upper:
-                return 0.5 * special.logErfc(z)
+                return math.log(0.5) + special.logErfc(z)
             else:
-                return 0.5 * special.logErfc(-z)
+                return math.log(0.5) + special.logErfc(-z)
         else:
             if upper:
                 return 0.5 * special.erfc(z)
