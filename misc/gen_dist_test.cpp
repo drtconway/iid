@@ -53,7 +53,7 @@ int main(int argc, const char* argv[])
     {
         boost::random::exponential_distribution<double> rexp(0.01);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -76,7 +76,7 @@ int main(int argc, const char* argv[])
     {
         boost::random::exponential_distribution<double> rexp(0.005);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -100,7 +100,7 @@ int main(int argc, const char* argv[])
         boost::random::exponential_distribution<double> rexp1(0.05);
         boost::random::exponential_distribution<double> rexp2(0.01);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -123,7 +123,7 @@ int main(int argc, const char* argv[])
         boost::random::exponential_distribution<double> rexp1(0.05);
         boost::random::exponential_distribution<double> rexp2(0.01);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -145,7 +145,7 @@ int main(int argc, const char* argv[])
     {
         boost::random::exponential_distribution<double> rexp(0.02);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -167,7 +167,7 @@ int main(int argc, const char* argv[])
     {
         boost::random::exponential_distribution<double> rexp(0.02);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -196,7 +196,7 @@ int main(int argc, const char* argv[])
         boost::random::exponential_distribution<double> rexp(0.02);
         boost::random::exponential_distribution<double> rexp2(0.005);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -226,7 +226,7 @@ int main(int argc, const char* argv[])
         boost::random::exponential_distribution<double> rexp(0.02);
         boost::random::exponential_distribution<double> rexp2(0.005);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {
@@ -253,7 +253,7 @@ int main(int argc, const char* argv[])
         boost::random::exponential_distribution<double> rexp(0.075);
         boost::random::exponential_distribution<double> rexp2(0.005);
 
-        cout << "seed:" << S << endl;
+        cout << "seed: " << S << endl;
         cout << "data:" << endl;
         for (int i = 0; i < N; ++i)
         {

@@ -14,5 +14,5 @@ def test_erfc():
 def test_logErfc():
     for (x, r, lr) in data:
         lr0 = logErfc(x)
-        assert same(lr, lr0, 5e-14)
+        assert same(lr, lr0, 5e-13)
 

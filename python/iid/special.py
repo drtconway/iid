@@ -276,6 +276,19 @@ def logGammaPQ(a, x):
     lBigG = lGam - basic.logGamma(a)
     return (basic.log1mexp(lBigG), lBigG)
 
+def digamma(x):
+    '''compute the digamma function of x.'''
+    g = 0.5772156649015328606065120900824024310421
+    n = 1
+    s = 0
+    while True:
+        t = 1.0 / (n + x) - 1.0/n
+        s += t
+        if abs(t/s) < 1e-14:
+            break
+        n += 1
+    return s
+
 def logBeta(a, b):
     '''compute log beta'''
     return basic.logGamma(a) + basic.logGamma(b) - basic.logGamma(a + b)
@@ -522,10 +535,12 @@ def erfc(x):
         return 2.0 - erfc(-x)
     if x < 0.5:
         return 1 - erf(x)
-    aa = lambda j : 0.5*j
-    bb = lambda j : x
-    v = basic.contFrac(aa, bb)
-    return math.exp(-x*x)/(basic.sqrt_pi*(x + v))
+    if x < 50:
+        aa = lambda j : 0.5*j
+        bb = lambda j : x
+        v = basic.contFrac(aa, bb)
+        return math.exp(-x*x)/(basic.sqrt_pi*(x + v))
+    return gammaQ(0.5, x*x)/basic.sqrt_pi
 
 def logErfc(x):
     '''compute log(erfc(x))'''
@@ -533,8 +548,10 @@ def logErfc(x):
         return math.log(2.0 - erfc(-x))
     if x < 0.5:
         return basic.log1p(-erf(x))
-    aa = lambda j : 0.5*j
-    bb = lambda j : x
-    v = basic.contFrac(aa, bb)
-    return -x*x - basic.log_sqrt_pi - math.log(x + v)
+    if x < 50:
+        aa = lambda j : 0.5*j
+        bb = lambda j : x
+        v = basic.contFrac(aa, bb)
+        return -x*x - basic.log_sqrt_pi - math.log(x + v)
+    return logGammaQ(0.5, x*x) - basic.log_sqrt_pi
 

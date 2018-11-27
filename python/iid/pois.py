@@ -4,7 +4,7 @@ from iid.dist import dist
 import iid.special as special
 
 class norm(dist):
-    def __init__(self, lam)
+    def __init__(self, lam):
         self.lam = lam
         self.llam = math.log(lam)
 
