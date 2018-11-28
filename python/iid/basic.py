@@ -297,6 +297,12 @@ def logFac(n):
 
 def logChoose(n, k):
     '''compute log of binomial choice log(n k)'''
+    assert k >= 0 and k <= n
+    if k == 0 or k == n:
+        return 0.0
+    if k == 1 or n - k == 1:
+        return math.log(n)
+
     return logFac(n) - (logFac(n - k) + logFac(k))
 
 def choose(N, K):
