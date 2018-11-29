@@ -1,7 +1,7 @@
 import os
+import sys
 import yaml
-from iid.special import lowerBeta
-import iid.tests.data_ibetaInt as ibI
+from iid.beta import beta
 
 def sameAbs(a, b, eps):
     return abs(a - b) < eps
@@ -11,36 +11,28 @@ def same(a, b, eps):
         return abs((a - b)/a) < eps
     return abs(a - b) < eps
 
-def test_ibetaInt():
-    for itm in ibI.data:
-        a = itm[0]
-        b = itm[1]
-        x = itm[2]
-        rL = itm[3]
-        rL0 = lowerBeta(a, b, x)
-        assert same(rL, rL0, 1e-12)
-
-def test_ibetaGood():
+def addTests():
+    thisModule = sys.modules[__name__]
     wd = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(wd, 'data-ibeta-good.yaml')) as f:
-        data = yaml.load(f)
+    with open(os.path.join(wd, 'data', 'dist', 'beta.yaml')) as f:
+        data = yaml.load(f)['data']
     for itm in data:
         a = itm[0]
         b = itm[1]
         x = itm[2]
-        rL = itm[3]
-        rL0 = lowerBeta(a, b, x)
-        assert same(rL, rL0, 1e-12)
+        m = itm[3]
+        v = itm[4]
+        rP = itm[5]
+        rL = itm[6]
+        testName = 'test_beta_%d_%d_%f' % (a, b, x)
+        def thisTest():
+            dst = beta(a, b)
+            assert same(m, dst.mean(), 1e-14)
+            assert same(v, dst.var(), 1e-14)
+            rP0 = dst.pdf(x)
+            assert same(rP, rP0, 1e-12)
+            rL0 = dst.cdf(x)
+            assert same(rL, rL0, 1e-12)
+        setattr(thisModule, testName, thisTest)
 
-def test_ibetaBad():
-    wd = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(wd, 'data-ibeta-bad.yaml')) as f:
-        data = yaml.load(f)
-    for itm in data:
-        a = itm[0]
-        b = itm[1]
-        x = itm[2]
-        rL = itm[3]
-        rL0 = lowerBeta(a, b, x)
-        assert not same(rL, rL0, 1e-12)
-
+addTests()

@@ -1,4 +1,5 @@
 import os
+import sys
 import yaml
 from iid.hyper import hyper
 
@@ -7,7 +8,8 @@ def same(a, b, eps):
         return abs((a - b)/a) < eps
     return abs(a - b) < eps
 
-def test_binom():
+def addTests():
+    thisModule = sys.modules[__name__]
     wd = os.path.dirname(os.path.realpath(__file__))
     with open(os.path.join(wd, 'data', 'dist', 'hyper.yaml')) as f:
         data = yaml.load(f)['data']
@@ -21,15 +23,16 @@ def test_binom():
         rP = itm[6]
         rL = itm[7]
         rU = itm[8]
-        dst = hyper(N, K, n)
-        assert same(m, dst.mean(), 1e-14)
-        assert same(v, dst.var(), 1e-14)
-        rP0 = dst.pmf(k)
-        if not same(rP, rP0, 1e-14):
-            print(itm, rP0, abs((rP-rP0)/rP))
-        assert same(rP, rP0, 1e-14)
-        rL0 = dst.cdf(k)
-        if not same(rL, rL0, 1e-14):
-            print(itm, rL0, abs((rL-rL0)/rL))
-        assert same(rL, rL0, 1e-14)
 
+        testName = 'test_hyper_%d_%d_%d_%d' % (N, K, n, k)
+        def thisTest():
+            dst = hyper(N, K, n)
+            assert same(m, dst.mean(), 1e-14)
+            assert same(v, dst.var(), 1e-14)
+            rP0 = dst.pmf(k)
+            assert same(rP, rP0, 1e-14)
+            rL0 = dst.cdf(k)
+            assert same(rL, rL0, 1e-14)
+        setattr(thisModule, testName, thisTest)
+
+addTests()
