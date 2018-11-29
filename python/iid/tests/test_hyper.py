@@ -29,7 +29,7 @@ def test_binom():
             print(itm, rP0, abs((rP-rP0)/rP))
         assert same(rP, rP0, 1e-14)
         rL0 = dst.cdf(k)
-        if not same(rL, rL0, 1e-11):
+        if not same(rL, rL0, 1e-14):
             print(itm, rL0, abs((rL-rL0)/rL))
-        assert same(rL, rL0, 1e-11)
+        assert same(rL, rL0, 1e-14)
 

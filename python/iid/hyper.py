@@ -7,6 +7,8 @@ class hyper(dist):
         self.N = N
         self.K = K
         self.n = n
+        self.kMin = max(0, n + K - N)
+        self.kMax = min(n, K)
 
     def mean(self):
         N = float(self.N)
@@ -28,8 +30,8 @@ class hyper(dist):
         K = self.K
         n = self.n
 
-        assert k >= max(0, n + K - N)
-        assert k <= min(n, K)
+        assert self.kMin <= k
+        assert k <= self.kMax
 
         if 'log' in args and args['log']:
             return basic.logChoose(K, k) + basic.logChoose(N - K, n - k) - basic.logChoose(N, n)
@@ -41,24 +43,26 @@ class hyper(dist):
         K = self.K
         n = self.n
 
-        assert k >= max(0, n + K - N)
-        assert k <= min(n, K)
+        assert self.kMin <= k
+        assert k <= self.kMax
 
-        if k == min(n, K):
-            return 1.0
-
+        # Find the mode, to decide which direction to do the summation
+        #
         w = (n + 1.0)*(K + 1.0)/(N + 2.0)
 
-        if k < w:
+        if k == self.kMax:
+            lls = 0.0
+            lus = None
+        elif k < w:
             s = 0
-            for j in range(max(0, n + K - N), k+1):
+            for j in range(k, self.kMin-1, -1):
                 t = self.pmf(j)
                 s += t
             lls = math.log(s)
             lus = None
         else:
             s = 0
-            for j in range(k+1, min(n,K)+1):
+            for j in range(k+1, self.kMax+1):
                 t = self.pmf(j)
                 s += t
             lls = None
@@ -79,14 +83,4 @@ class hyper(dist):
             return lr
         return math.exp(lr)
 
-        #lr0 = basic.logChoose(n, k+1) + basic.logChoose(N-n, K-k-1) - basic.logChoose(N, K)
-        #lr1 = basic.logHyper([1, k+1-K, k+1-n], [k+2, N+k+2-K-n], 1)
-        #lr = lr0 + lr1
-        #if not ('upper' in args and args['upper']):
-        #    lr = basic.log1mexp(lr)
-
-        #if 'log' in args and args['log']:
-        #    return lr
-        #else:
-        #    return math.exp(lr)
 
