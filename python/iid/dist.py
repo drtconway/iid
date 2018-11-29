@@ -3,10 +3,8 @@ import random
 class dist(object):
     '''base class for distributions with some helper functions'''
 
-    def quantK(self, q):
+    def quantK(self, q, lo, hi):
         '''compute quantiles of discrete distribution by bisection search on the CDF'''
-        lo = 0
-        hi = self.n
 
         if self.cdf(lo) >= q:
             return lo
@@ -30,7 +28,22 @@ class dist(object):
         while q0 < q:
             lo += 1
             q0 += self.pmf(lo)
-        assert self.cdf(lo) >= q
+        return lo
+
+    def quantX(self, q, lo, hi):
+        if self.cdf(lo) >= q:
+            return lo
+        if self.cdf(hi) <= q:
+            return hi
+
+        eps = 1e-9
+        while (hi - lo)/hi > eps:
+            mid = (lo + hi) / 2.0
+            q0 = self.cdf(mid)
+            if q0 < q:
+                lo = mid
+            else:
+                hi = mid
         return lo
 
     def rndK(self, lo, hi):

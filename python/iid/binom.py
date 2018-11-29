@@ -53,7 +53,7 @@ class binom(dist):
             return math.exp(ls)
 
     def quant(self, q):
-        return self.quantK(q)
+        return self.quantK(q, 0, self.n)
 
     def rnd(self):
         if self.n < 25:
